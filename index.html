@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>CBC Check-in</title>
+<style>
+  html, body { margin: 0; height: 100%; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #faf9f5; color: #1f1e1d; }
+  iframe { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+  .closed { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; box-sizing: border-box; }
+  .closed h1 { font-size: 1.5rem; margin: 0 0 8px; }
+  .closed p { margin: 0; color: #6b6a68; max-width: 32ch; line-height: 1.5; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+  // ================== SETTINGS: edit only this block ==================
+
+  // 1. Master switch. Set to false to close check-in immediately.
+  var OPEN = true;
+
+  // 2. Optional automatic window (India time). Leave both as "" to use only the switch above.
+  //    Format: "2026-11-12T18:00"
+  var OPENS_AT  = "";
+  var CLOSES_AT = "";
+
+  // 3. Message shown when check-in is closed.
+  var CLOSED_TITLE = "Check-in is closed";
+  var CLOSED_TEXT  = "This form is only open during Claude Builder Club meetings.";
+
+  // ====================================================================
+
+  var _c = "Dhs2Yi4LFD9uIg0ZNW0lEkFoODlQXmg9Y1JGKTZlUkoodC1OXHMvfw==";
+  var _k = [23, 91, 7, 44, 61];
+  function _r() {
+    var s = atob(_c), n = s.length, o = "";
+    for (var i = 0; i < n; i++) o += String.fromCharCode(s.charCodeAt(n - 1 - i) ^ _k[i % 5]);
+    return o;
+  }
+
+  function ist(s) { return s ? new Date(s + ":00+05:30").getTime() : null; }
+
+  var now = Date.now();
+  var start = ist(OPENS_AT), end = ist(CLOSES_AT);
+  var live = OPEN && (start === null || now >= start) && (end === null || now <= end);
+  var root = document.getElementById("root");
+
+  if (live) {
+    var f = document.createElement("iframe");
+    f.title = "CBC Check-in";
+    f.allow = "geolocation; camera";
+    f.referrerPolicy = "no-referrer";
+    root.appendChild(f);
+    f.contentWindow.location.replace(_r());
+    if (end !== null) setTimeout(function () { location.reload(); }, Math.max(end - now, 0) + 1000);
+  } else {
+    root.innerHTML = '<div class="closed"><h1></h1><p></p></div>';
+    root.querySelector("h1").textContent = CLOSED_TITLE;
+    root.querySelector("p").textContent = CLOSED_TEXT;
+  }
+
+  document.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  document.addEventListener("keydown", function (e) {
+    var k = (e.key || "").toLowerCase();
+    if (k === "f12" || ((e.ctrlKey || e.metaKey) && (k === "u" || k === "s" || (e.shiftKey && (k === "i" || k === "j" || k === "c"))))) e.preventDefault();
+  });
+</script>
+</body>
+</html>
